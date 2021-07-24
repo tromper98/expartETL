@@ -140,17 +140,3 @@ if args.option == "hist" and args.date:
     data = load_historical_data(url, token, currency, args.date)
 if args.option == "timeseries" and args.start_date:
     data = load_timeseries_data(url, token, currency, args.start_date, args.end_date)
-
-
-
-#
-#if url:
-#    
-#    print(data)
-#    data = load_historical_data(url, token, currency, "2020-12-30")
-#    print(data)
-
-
-
-
-
