@@ -5,7 +5,7 @@ API_CONNECTION: #Параметры подключения к API сайта с 
       - USD
       - EUR
       - RUB
-      - CHY
+      - CNY
 
 DATABASE:
   UserName: testUser
@@ -15,3 +15,5 @@ DATABASE:
     DataBase_Name: DWH
   DataMart:
     DataBase_Name: DM_ExchangePart
+
+    
