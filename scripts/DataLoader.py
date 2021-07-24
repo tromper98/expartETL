@@ -5,9 +5,9 @@ import sys
 import argparse
 import os
 import json
-
 import yaml
-import pandas as pd
+from datetime import date
+
 import requests 
 from requests.models import Response
 from requests.exceptions import RequestException
@@ -97,20 +97,58 @@ def load_timeseries_data(url, token, currency, start_date, end_date):
                         "&end_date=" + end_date + "&symbols=" + currency)
             return None
 
-# проверка, имеются ли в JSON данные или ошибка 
+# проверка, имеются ли в JSON данные или он содержит ошибку 
 def check_response(response):
     if response["error"]:
         Logger.error("API вернул ошибк: " + response['error']["message"])
         return False;
-    if response["success"] == "true":
+    if response["success"]:
+        Logger.info("Получены данные в JSON")
         return True;
+
 Logger = create_logger("DataLoader")
+
+#Добавление аргументов командной строки
+parser = argparse.ArgumentParser(description="Осуществляет загрузку данных об обменном курсе")
+parser.add_argument(
+    "-o", "--option", 
+    type=str,
+    help="Определяет какой тип GET-запроса будет отправлен. По умолчанию: latest",
+    default="latest")
+parser.add_argument(
+    "-d", "--date",
+    type=str,
+    help="День, накоторый будет загружена информация. Работает в типом hist" 
+)
+parser.add_argument(
+    "-s", "--start_date",
+    type=str,
+    help="Начальная дата периода",
+    default=None)
+parser.add_argument(
+    "-e", "--end_date",
+    type=str,
+    help="Конечная дата периода. По умолчанию - текущая дата",
+    default=str(date.today()))
+
+args = parser.parse_args()
 url, token, currency = parse_API_config()
-if url:
+
+if args.option == "latest":
     data = load_latest_data(url, token, currency)
-    print(data)
-    data = load_historical_data(url, token, currency, "2020-12-30")
-    print(data)
+if args.option == "hist" and args.date:
+    data = load_historical_data(url, token, currency, args.date)
+if args.option == "timeseries" and args.start_date:
+    data = load_timeseries_data(url, token, currency, args.start_date, args.end_date)
+
+
+
+#
+#if url:
+#    
+#    print(data)
+#    data = load_historical_data(url, token, currency, "2020-12-30")
+#    print(data)
 
 
 
