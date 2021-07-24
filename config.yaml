@@ -1,0 +1,17 @@
+API_CONNECTION: #Параметры подключения к API сайта с информацией о валютах
+  URL: http://api.exchangeratesapi.io/v1
+  Token: 767c2ca2b7941cb74f56f0ffe615db7a
+  Currency:
+      - USD
+      - EUR
+      - RUB
+      - CHY
+
+DATABASE:
+  UserName: testUser
+  Password: test12345
+  Port: 
+  WareHouse:
+    DataBase_Name: DWH
+  DataMart:
+    DataBase_Name: DM_ExchangePart
