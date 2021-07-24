@@ -5,7 +5,6 @@ from pathlib import Path
 
 from Logger import create_logger
 
-
 def load_API_config():
     """
     Загрузка параметров подключения к API сайта (URL, token) 
