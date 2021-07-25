@@ -14,6 +14,7 @@ from requests.exceptions import RequestException
 
 from Logger import create_logger
 from ParseConfig import parse_API_config
+from CSVHandler import write_to_csv
 
 def send_GET(url, type, params):
     """
@@ -134,6 +135,7 @@ parser.add_argument(
 args = parser.parse_args()
 url, token, currency = parse_API_config()
 
+#Проверка переданного аргумента и вызов соответствующего GET-запроса
 if args.option == "latest":
     json = load_latest_data(url, token, currency)
     data = convert_JSON(json)
@@ -144,5 +146,6 @@ if args.option == "timeseries" and args.start_date:
     json = load_timeseries_data(url, token, currency, args.start_date, args.end_date)
     data = json["rates"]
 
-
-status = check_response(data)
+#Если данные были получены, то сохраняем в csv-файл
+if check_response(data):
+    write_to_csv("temp/temp.csv")
