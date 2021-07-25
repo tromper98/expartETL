@@ -6,7 +6,7 @@ API_CONNECTION: #Параметры подключения к API сайта с 
       - EUR
       - RUB
       - CNY
-
+  Base: EUR
 DATABASE:
   UserName: testUser
   Password: test12345
@@ -16,4 +16,3 @@ DATABASE:
   DataMart:
     DataBase_Name: DM_ExchangePart
 
-    

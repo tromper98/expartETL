@@ -30,7 +30,8 @@ def parse_API_config():
         url = config["URL"]
         token = config["Token"]
         currency = ",".join(config["Currency"])
-        return url, token, currency
+        base = config["Base"]
+        return url, token, base, currency
     else:
         Logger.error("Не удалось получить данные для подключения к API")
 

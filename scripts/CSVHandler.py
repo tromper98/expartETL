@@ -29,7 +29,18 @@ def write_to_csv(filename, data):
 
 #Чтение csv-файла
 def read_csv(filename):
-    pass
+    try:
+        Logger.info("Чтение файла " + filename)
+        rows = []
+        with open(filename, "r", encoding="UTF-8") as r_file:
+            file_reader = csv.reader(r_file, delimiter=";", lineterminator="\r")
+            for row in file_reader:
+                rows.append(row)
+        Logger.info("Чтение файла " + filename + " завершено")
+        return rows
+    except FileNotFoundError:
+        Logger.error("Ошибка чтения файла. Файл " + filename + " не найден")
+        return None
 
 #Получить список валют из словаря
 def get_currency_keys(dict):
@@ -41,3 +52,5 @@ def get_currency_keys(dict):
 
 Logger = create_logger("CSVHandler")
 
+data = read_csv("temp/temp.csv")
+print(data)

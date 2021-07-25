@@ -32,31 +32,31 @@ def send_GET(url, type, params):
 
 # проверка, имеются ли в JSON данные или он содержит ошибку 
 def check_response(response):
-    if response["error"]:
+    if "error" in response:
         Logger.error("API вернул ошибк: " + response['error']["message"])
         return False;
-    if response["success"]:
+    else:
         Logger.info("Получены данные в JSON")
         return True;
 
-def load_latest_data(url, token, currency):
+def load_latest_data(url, token, base, currency):
     """
     Получить самые последние данные об обменном курсе
     """
     Logger.info("Отправка GET-запроса на URL " + url + "/latest")
-    request_params = [('access_key', token), ('symbols', currency)]
+    request_params = [('access_key', token), ('base', base), ('symbols', currency)]
     #Отправка GET-запроса
     response = send_GET(url, "latest", request_params)
     if response:
         Logger.info("Запрос " + url + "/latest" + "?access_key=" + token + 
-                    "symbols=" + currency + " выполнен успешно")
+                    "&base=" + base + "&symbols=" + currency + " выполнен успешно")
         return response
     else:
         Logger.error("Не удалось выполнить запрос " + url + "/latest" 
-                     + "?access_key=" + token + "symbols=" + currency)
+                     + "?access_key=" + token + "&base=" + base + "&symbols=" + currency)
         return None
 
-def load_historical_data(url, token, currency, date):
+def load_historical_data(url, token, base, currency, date):
     """
     Получить данные об обменном курсе за указанную дату "yyyy-mm-dd"
     """
@@ -67,7 +67,7 @@ def load_historical_data(url, token, currency, date):
         Logger.error('Введена некоректная дата')    
     else:
         #Отправка GET-запроса
-        request_params = [('access_key', token), ('symbols', currency)]
+        request_params = [('access_key', token), ('base', base), ('symbols', currency)]
         Logger.info("Отправка GET-запроса на URL " + url + "/" + date)
         response = send_GET(url, date, request_params)
         if response:
@@ -76,10 +76,10 @@ def load_historical_data(url, token, currency, date):
             return response
         else:
             Logger.error(" Не удалось выполнить запрос " + url + "/" + date + "?access_key=" + token + 
-                    "symbols=" + currency)
+                    "$symbols=" + currency)
             return None
 
-def load_timeseries_data(url, token, currency, start_date, end_date):
+def load_timeseries_data(url, token, base, currency, start_date, end_date):
     """
     Получить данные об обменном курсе валют за указанный промежуток времени (start_date : end_date) 
     """
@@ -94,7 +94,7 @@ def load_timeseries_data(url, token, currency, start_date, end_date):
         Logger.error('Введены некорректные даты')
     else:
         #отправка GET-запроса
-        request_params = [('access_key', token), ("start_date", start_date), 
+        request_params = [('access_key', token), ('base', base), ("start_date", start_date), 
                           ("end_date", end_date),("symbols", currency)]
         Logger.info("Отправка GET-запроса на URL:" + url + "/timeseries")
         response = send_GET(url, "timeseries", request_params)
@@ -133,19 +133,19 @@ parser.add_argument(
     default=str(date.today()))
 
 args = parser.parse_args()
-url, token, currency = parse_API_config()
+url, token, base, currency = parse_API_config()
 
 #Проверка переданного аргумента и вызов соответствующего GET-запроса
 if args.option == "latest":
-    json = load_latest_data(url, token, currency)
+    json = load_latest_data(url, token, base, currency)
     data = convert_JSON(json)
 if args.option == "hist" and args.date:
-    json = load_historical_data(url, token, currency, args.date)
+    json = load_historical_data(url, token, base, currency, args.date)
     data = convert_JSON(json)
 if args.option == "timeseries" and args.start_date:
-    json = load_timeseries_data(url, token, currency, args.start_date, args.end_date)
+    json = load_timeseries_data(url, token, base, currency, args.start_date, args.end_date)
     data = json["rates"]
 
 #Если данные были получены, то сохраняем в csv-файл
 if check_response(data):
-    write_to_csv("temp/temp.csv")
+    write_to_csv("temp/temp.csv", data)
