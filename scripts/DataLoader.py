@@ -6,7 +6,6 @@ import json
 from datetime import date, timedelta
 
 import requests 
-from requests.models import Response
 from requests.exceptions import RequestException
 
 from Logger import create_logger
