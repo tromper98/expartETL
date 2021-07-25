@@ -50,7 +50,9 @@ def get_currency_keys(dict):
         nested_keys.append(nested_key)
     return nested_keys
 
+#разделить список на два: наименования столбцов и данные
+def split_col_names_data(list):
+    return list[0], list[1:] 
+    
 Logger = create_logger("CSVHandler")
 
-data = read_csv("temp/temp.csv")
-print(data)
