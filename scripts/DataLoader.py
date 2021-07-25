@@ -1,12 +1,9 @@
 # Осуществляет подключение к API сайта с информацией о курсах валют и 
 # выгружает данные в csv файл
 import time
-import sys
 import argparse
-import os
 import json
-import yaml
-from datetime import date
+from datetime import date, timedelta
 
 import requests 
 from requests.models import Response
@@ -107,6 +104,21 @@ def load_timeseries_data(url, token, base, currency, start_date, end_date):
                         "&end_date=" + end_date + "&symbols=" + currency)
             return None
 
+#Загружает данные за последние полгода для наполнения DWH
+#Использует единичные GET-запросы на конкретную дату
+#Сделано для того, чтобы обойти ограничения бесплатной версии API   
+def load_example_data(url, token, base, currency):
+    #Итератор по датам.
+    def daterange(start_date, end_date):
+        for n in range(int((end_date - start_date).days)):
+            yield start_date + timedelta(n)
+    start_date = date.today() - timedelta(180)
+    #Итеративное обращение к API
+    for single_date in daterange(start_date, date.today()):
+        json = load_historical_data(url, token, base, currency, single_date.strftime("%Y-%m-%d"))
+        data = convert_JSON(json)
+        write_to_csv("temp/example.csv", data)
+        
 Logger = create_logger("DataLoader")
 convert_JSON = lambda json: {json["date"] : json["rates"]} #Конвертировать JSON в формат: {date :{"cur_name1" : num1, "cur_name2" : num2 ...}} 
 #Добавление аргументов командной строки
@@ -145,7 +157,9 @@ if args.option == "hist" and args.date:
 if args.option == "timeseries" and args.start_date:
     json = load_timeseries_data(url, token, base, currency, args.start_date, args.end_date)
     data = json["rates"]
+if args.option == "example":
+    load_example_data(url, token, base, currency)
 
 #Если данные были получены, то сохраняем в csv-файл
-if check_response(data):
+if args.option != "example" and check_response(data):
     write_to_csv("temp/temp.csv", data)
