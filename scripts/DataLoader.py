@@ -29,6 +29,15 @@ def send_GET(url, type, params):
                          url + "/" + type)
         return None
 
+# проверка, имеются ли в JSON данные или он содержит ошибку 
+def check_response(response):
+    if response["error"]:
+        Logger.error("API вернул ошибк: " + response['error']["message"])
+        return False;
+    if response["success"]:
+        Logger.info("Получены данные в JSON")
+        return True;
+
 def load_latest_data(url, token, currency):
     """
     Получить самые последние данные об обменном курсе
@@ -97,17 +106,8 @@ def load_timeseries_data(url, token, currency, start_date, end_date):
                         "&end_date=" + end_date + "&symbols=" + currency)
             return None
 
-# проверка, имеются ли в JSON данные или он содержит ошибку 
-def check_response(response):
-    if response["error"]:
-        Logger.error("API вернул ошибк: " + response['error']["message"])
-        return False;
-    if response["success"]:
-        Logger.info("Получены данные в JSON")
-        return True;
-
 Logger = create_logger("DataLoader")
-
+convert_JSON = lambda json: {json["date"] : json["rates"]} #Конвертировать JSON в формат: {date :{"cur_name1" : num1, "cur_name2" : num2 ...}} 
 #Добавление аргументов командной строки
 parser = argparse.ArgumentParser(description="Осуществляет загрузку данных об обменном курсе")
 parser.add_argument(
@@ -135,10 +135,14 @@ args = parser.parse_args()
 url, token, currency = parse_API_config()
 
 if args.option == "latest":
-    data = load_latest_data(url, token, currency)
+    json = load_latest_data(url, token, currency)
+    data = convert_JSON(json)
 if args.option == "hist" and args.date:
-    data = load_historical_data(url, token, currency, args.date)
+    json = load_historical_data(url, token, currency, args.date)
+    data = convert_JSON(json)
 if args.option == "timeseries" and args.start_date:
-    data = load_timeseries_data(url, token, currency, args.start_date, args.end_date)
+    json = load_timeseries_data(url, token, currency, args.start_date, args.end_date)
+    data = json["rates"]
+
 
 status = check_response(data)
