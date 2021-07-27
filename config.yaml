@@ -8,11 +8,11 @@ API_CONNECTION: #Параметры подключения к API сайта с 
       - CNY
   Base: EUR
 DATABASE:
-  UserName: testUser
+  Host: localhost
+  UserName: admin
   Password: test12345
-  Port: 
-  WareHouse:
-    DataBase_Name: DWH
-  DataMart:
-    DataBase_Name: DM_ExchangePart
+  Port: 3306
+  Databases:
+    WareHouse: DWH
+    DataMart: DM_ExchangePart
 

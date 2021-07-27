@@ -107,6 +107,9 @@ def load_timeseries_data(url, token, base, currency, start_date, end_date):
 #Использует единичные GET-запросы на конкретную дату
 #Сделано для того, чтобы обойти ограничения бесплатной версии API   
 def load_example_data(url, token, base, currency):
+    """
+    Загрузка данных для начального наполнения БД. 
+    """
     #Итератор по датам.
     def daterange(start_date, end_date):
         for n in range(int((end_date - start_date).days)):

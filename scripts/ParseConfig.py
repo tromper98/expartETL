@@ -1,14 +1,13 @@
-#Набор функций для обращения к yaml файлу конфигурации и излвечения из него данных
+#Набор функций для обращения к yaml файлу конфигурации и извлечения из него данных
 
 import yaml
 from pathlib import Path
 
 from Logger import create_logger
 
-def load_API_config():
+def read_config(section):
     """
-    Загрузка параметров подключения к API сайта (URL, token) 
-    и списка валют 
+    Чтение конфигурационного файла. возвращает указанную секцию файла  
     """
     try:
         myself = Path(__file__).resolve()
@@ -16,14 +15,28 @@ def load_API_config():
         with open(path) as cf:
             read_data = yaml.safe_load(cf)
         Logger.info("Чтение файла 'config.yaml' выполнено успешно")       
-        return read_data["API_CONNECTION"]
+        return read_data[section]
     except FileNotFoundError:
         Logger.error("Файл конфигурации 'config.yaml' не найден.")
         return None
 
+#Читает config.yaml и возвращает секцию API_CONNECTION 
+def load_API_config():
+    """
+    Загрузка параметров подключения к API сайта (URL, token) 
+    и списка валют 
+    """
+    api_config = read_config("API_CONNECTION")
+    if (api_config):
+        return api_config
+    else:
+        return None
+
+
+#Парсит полученную секцию из load_API_config и возвращает параметры поэлементно
 def parse_API_config():
     """
-        Получить данные для подключения к API из конфигурационного файла
+    Получить данные для подключения к API из конфигурационного файла
     """
     config = load_API_config()
     if config:
@@ -35,4 +48,32 @@ def parse_API_config():
     else:
         Logger.error("Не удалось получить данные для подключения к API")
 
+#Получает данные для подключения к БД из config.yaml
+def load_database_config():
+    """
+    Получить параметры подключения к БД из файла конфигурации
+    """
+    database_config = read_config("DATABASE")
+    if database_config:
+        return database_config
+    else:
+        return None
+
+#парсер конфигурации подключения к базе данных
+def parse_database_config():
+    """
+    Извлечение данных о подключения к базе данных
+    """
+    config = load_database_config()
+    if config:
+        host = config["Host"]
+        user = config["UserName"]
+        password = config["Password"]
+        port = config["Port"]
+        databases = config["Databases"]
+        return host, user, password, port, databases
+    else:
+        Logger.error("Не удалось получить данные о подключении к БД")
+
 Logger = create_logger("ParseConfig")
+
