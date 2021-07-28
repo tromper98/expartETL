@@ -71,7 +71,7 @@ def parse_database_config():
         password = config["Password"]
         port = config["Port"]
         databases = config["Databases"]
-        return host, user, password, port, databases
+        return  user, password, host, port, databases
     else:
         Logger.error("Не удалось получить данные о подключении к БД")
 
