@@ -1,6 +1,6 @@
 #Обработчик CSV-файлов. Осуществляет чтение и запись данных. 
 
-import logging
+import traceback
 import os
 import csv
 
@@ -39,7 +39,7 @@ def read_csv(filename):
         Logger.info("Чтение файла " + filename + " завершено")
         return rows
     except FileNotFoundError:
-        Logger.error("Ошибка чтения файла. Файл " + filename + " не найден")
+        Logger.error("Ошибка чтения файла. Файл " + filename + " не найден",  traceback.format_exc())
         return None
 
 #Получить список валют из словаря
@@ -53,6 +53,6 @@ def get_currency_keys(dict):
 #разделить список на два: наименования столбцов и данные
 def split_col_names_data(list):
     return list[0], list[1:] 
-    
+
 Logger = create_logger("CSVHandler")
 

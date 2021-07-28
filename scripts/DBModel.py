@@ -2,6 +2,7 @@
 #выполняют подключение и загрузку данных в БД
 import argparse
 from datetime import  datetime
+import traceback
 
 import numpy as np
 from mysql.connector import connect, Error
@@ -20,12 +21,12 @@ def open_connection(user, password, database, host, port=3306):
         connection = connect(user=user, password=password, database=database, host=host, port=port, buffered = True)
         return connection
     except Error:
-        Logger.error("Ошибка подключения к базе данных " + database)
+        Logger.error("Ошибка подключения к базе данных " + database,  traceback.format_exc())
         return None
 
 #Вставка валютных знаков в таблицу currency
 #Поле currency_load_datetime заполняется с помощью вызова триггера before insert
-def insert_currencies(connection, currency_names):
+def insert_currencies(connection, currency_codes):
     """
     Вставка валютных знаков в БД    
     """
@@ -33,12 +34,12 @@ def insert_currencies(connection, currency_names):
         Logger.info("Запись данных в таблицу currency")
         with connection.cursor() as cursor:
             query = "INSERT INTO currency (currency_id, currency_name) VALUES (%s, %s);"
-            for currency_name in currency_names:
-                cursor.execute(query, (None, currency_name))      
+            for currency_code in currency_codes:
+                cursor.execute(query, (None, currency_code))      
                 connection.commit()
         Logger.info("Запись данных успешно завершена")
     except Error:
-       Logger.info("Ошибка записи данных в таблицу currency. Ошибка: " + str(Error))
+       Logger.error("Ошибка записи данных в таблицу currency. Ошибка: ",  traceback.format_exc())
 
 #Вставка значений курса валют из временного файла temp.csv
 #Поле rate_load_datetime заполняется через триггер before insert 
@@ -62,9 +63,26 @@ def insert_rates(connection, data):
             connection.commit()
         Logger.info("Запись данных успешно завершена")
     except Error:
-        Logger.error("Ошибка записи данных в таблицу rate")
+        Logger.error("Ошибка записи данных в таблицу rate",  traceback.format_exc())
+
+#Вставка названий валют на русском и английском языках
+def insert_currency_names(connection):
+    """
+    Загрузить названия валют (rus, eng)
+    """
+    try:
+        Logger.info("Добавление данных в currency_name")
+        with connection.cursor() as cursor:
+            currency_names = [(1,"доллар", "dollar"), (2, "евро", "euro"), (3, "рубль", "rouble"), (4, "юань", "yuan")]
+            query = "INSERT INTO currency_name (currency_id, currency_name_rus, currency_name_eng) VALUES(%s, %s, %s)"
+            cursor.executemany(query, currency_names)
+        connection.commit()
+        Logger.info("Добавление данных успешно выполнено")
+    except Error:
+        Logger.error("Ошибка добавления данных в таблицу",  traceback.format_exc())
 
 Logger = create_logger("DBModel")
+
 #Добавление аргументов командной строки
 parser = argparse.ArgumentParser("Взаимодействие с базой данных")
 parser.add_argument(
@@ -76,6 +94,7 @@ parser.add_argument(
 #Получение параметров подключения и открытие соединения
 user, password, host, port, databases = parse_database_config()
 connection = open_connection(user, password, databases["WareHouse"], host, port)
+
 args = parser.parse_args()
 
 if args.insert == "rate":
@@ -89,10 +108,12 @@ if args.insert == "rate":
 #Начальное заполнение таблицы. Применять к пустой БД
 if args.insert == "example":
     if connection:
-        currency_names, data = split_col_names_data(read_csv("temp/example.csv"))
+        column_names, data = split_col_names_data(read_csv("temp/example.csv"))
         with connection:
+            connection.cursor().execute("SET FOREIGN_KEY_CHECKS=0")
             insert_rates(connection, data)
-            insert_currencies(connection, currency_names[1:])
-
+            insert_currencies(connection, column_names[1:])
+            insert_currency_names(connection)
+            connection.cursor().execute("SET FOREIGN_KEY_CHECKS=1")
     else:
         print("Отсутствует соединение с БД")

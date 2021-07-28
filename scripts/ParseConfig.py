@@ -1,5 +1,5 @@
 #Набор функций для обращения к yaml файлу конфигурации и извлечения из него данных
-
+import traceback
 import yaml
 from pathlib import Path
 
@@ -17,7 +17,7 @@ def read_config(section):
         Logger.info("Чтение файла 'config.yaml' выполнено успешно")       
         return read_data[section]
     except FileNotFoundError:
-        Logger.error("Файл конфигурации 'config.yaml' не найден.")
+        Logger.error("Файл конфигурации 'config.yaml' не найден.",  traceback.format_exc())
         return None
 
 #Читает config.yaml и возвращает секцию API_CONNECTION 
@@ -46,7 +46,7 @@ def parse_API_config():
         base = config["Base"]
         return url, token, base, currency
     else:
-        Logger.error("Не удалось получить данные для подключения к API")
+        Logger.error("Не удалось получить данные для подключения к API",  traceback.format_exc())
 
 #Получает данные для подключения к БД из config.yaml
 def load_database_config():
@@ -73,7 +73,7 @@ def parse_database_config():
         databases = config["Databases"]
         return  user, password, host, port, databases
     else:
-        Logger.error("Не удалось получить данные о подключении к БД")
+        Logger.error("Не удалось получить данные о подключении к БД",  traceback.format_exc())
 
 Logger = create_logger("ParseConfig")
 

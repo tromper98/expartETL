@@ -3,6 +3,7 @@
 import time
 import argparse
 import json
+import traceback
 from datetime import date, timedelta
 
 import requests 
@@ -23,7 +24,7 @@ def send_GET(url, type, params):
             return response.json()
     except RequestException:
         Logger.error("Произошла ошибка отправки GET-запроса по адресу ", 
-                         url + "/" + type)
+                         url + "/" + type, traceback.format_exc())
         return None
 
 # проверка, имеются ли в JSON данные или он содержит ошибку 
@@ -49,7 +50,7 @@ def load_latest_data(url, token, base, currency):
         return response
     else:
         Logger.error("Не удалось выполнить запрос " + url + "/latest" 
-                     + "?access_key=" + token + "&base=" + base + "&symbols=" + currency)
+                     + "?access_key=" + token + "&base=" + base + "&symbols=" + currency,  traceback.format_exc())
         return None
 
 def load_historical_data(url, token, base, currency, date):
@@ -60,7 +61,7 @@ def load_historical_data(url, token, base, currency, date):
     try:
         time.strptime(date, '%Y-%m-%d')
     except ValueError:
-        Logger.error('Введена некоректная дата')    
+        Logger.error('Введена некоректная дата',  traceback.format_exc())    
     else:
         #Отправка GET-запроса
         request_params = [('access_key', token), ('base', base), ('symbols', currency)]
@@ -72,7 +73,7 @@ def load_historical_data(url, token, base, currency, date):
             return response
         else:
             Logger.error(" Не удалось выполнить запрос " + url + "/" + date + "?access_key=" + token + 
-                    "$symbols=" + currency)
+                    "$symbols=" + currency,  traceback.format_exc())
             return None
 
 def load_timeseries_data(url, token, base, currency, start_date, end_date):
@@ -87,7 +88,7 @@ def load_timeseries_data(url, token, base, currency, start_date, end_date):
         time.strptime(start_date, '%Y-%m-%d')
         time.strptime(end_date, "%Y-%m-%d")
     except ValueError:
-        Logger.error('Введены некорректные даты')
+        Logger.error('Введены некорректные даты',  traceback.format_exc())
     else:
         #отправка GET-запроса
         request_params = [('access_key', token), ('base', base), ("start_date", start_date), 
@@ -100,7 +101,7 @@ def load_timeseries_data(url, token, base, currency, start_date, end_date):
             return response
         else:
             Logger.error("Не удалось выполнить запрос " + url + "/timeseries"  + "?access_key=" + token + "&start_date=" + start_date + 
-                        "&end_date=" + end_date + "&symbols=" + currency)
+                        "&end_date=" + end_date + "&symbols=" + currency,  traceback.format_exc())
             return None
 
 #Загружает данные за последние полгода для наполнения DWH
