@@ -64,28 +64,6 @@ def insert_rates(connection, data):
     except Error:
         Logger.error("Ошибка записи данных в таблицу rate")
 
-#Заполнение Link-таблицы currency_rates
-def insert_currency_rates(connection):
-    try:
-        Logger.info("Вставка данных в таблицу currency_rate")
-        with connection.cursor() as cursor:
-            #Получить currency_id
-            query = "SELECT currency_id FROM currency"
-            cursor.execute(query)
-            curr_id = cursor.fetchall()
-            #Получить rate_currency_id
-            query = "SELECT DISTINCT rate_currency_id FROM rate"
-            cursor.execute(query)
-            rate_id = cursor.fetchall()
-            #Вставка данных
-            query = "INSERT INTO currency_rate (currency_id, currency_rate_id) VALUES(%s, %s);"
-            values = [(curr_id[i][0], rate_id[i][0]) for i in range(len(curr_id))]
-            cursor.executemany(query, values)
-        connection.commit()
-        Logger.info("Вставка данных успешно завершена")
-    except Error:
-        Logger.error("Ошибка добавления данных в таблицу currency_rate")
-
 Logger = create_logger("DBModel")
 #Добавление аргументов командной строки
 parser = argparse.ArgumentParser("Взаимодействие с базой данных")
@@ -100,8 +78,6 @@ user, password, host, port, databases = parse_database_config()
 connection = open_connection(user, password, databases["WareHouse"], host, port)
 args = parser.parse_args()
 
-insert_currency_rates(connection)
-
 if args.insert == "rate":
     if connection:
         _, data = split_col_names_data(read_csv("temp/temp.csv"))
@@ -109,6 +85,7 @@ if args.insert == "rate":
             insert_rates(connection, data)
     else:
         print("Отсутствует соединение с БД")
+
 #Начальное заполнение таблицы. Применять к пустой БД
 if args.insert == "example":
     if connection:
@@ -116,5 +93,6 @@ if args.insert == "example":
         with connection:
             insert_rates(connection, data)
             insert_currencies(connection, currency_names[1:])
+
     else:
         print("Отсутствует соединение с БД")
