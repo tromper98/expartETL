@@ -33,7 +33,7 @@ def insert_currencies(connection, currency_codes):
     try:
         Logger.info("Запись данных в таблицу currency")
         with connection.cursor() as cursor:
-            query = "INSERT INTO currency (currency_id, currency_name) VALUES (%s, %s);"
+            query = "INSERT INTO currency (currency_id, currency_code) VALUES (%s, %s);"
             for currency_code in currency_codes:
                 cursor.execute(query, (None, currency_code))      
                 connection.commit()
@@ -73,8 +73,15 @@ def insert_currency_names(connection):
     try:
         Logger.info("Добавление данных в currency_name")
         with connection.cursor() as cursor:
-            currency_names = [(1,"доллар", "dollar"), (2, "евро", "euro"), (3, "рубль", "rouble"), (4, "юань", "yuan")]
-            query = "INSERT INTO currency_name (currency_id, currency_name_rus, currency_name_eng) VALUES(%s, %s, %s)"
+            currency_names = [(1,"доллар", "dollar", "dollar", "美元" ), 
+                              (2, "евро", "euro", "euro", "欧元"), 
+                              (3, "рубль", "rouble", "rubel", "卢布"), 
+                              (4, "юань", "yuan", "yuan", "人民币")
+                              ]
+            query = """INSERT INTO currency_name 
+                       (currency_id, currency_name_rus, currency_name_eng, 
+                       currency_name_deu, currency_name_chi)
+                       VALUES(%s, %s, %s, %s, %s)"""
             cursor.executemany(query, currency_names)
         connection.commit()
         Logger.info("Добавление данных успешно выполнено")
@@ -89,7 +96,7 @@ parser.add_argument(
     "-i", "--insert",
     type = str,
     help="Вставка значений в указанную таблицу. По умолчанию - rate",
-    default='rate')
+    default=None)
 
 #Получение параметров подключения и открытие соединения
 user, password, host, port, databases = parse_database_config()
