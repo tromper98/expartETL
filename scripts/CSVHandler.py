@@ -3,7 +3,7 @@
 import traceback
 import os
 import csv
-
+import argparse
 from Logger import create_logger
 
 #Запись данных в csv-файл
@@ -54,5 +54,22 @@ def get_currency_keys(dict):
 def split_col_names_data(list):
     return list[0], list[1:] 
 
+def remove_file(filename):
+    if os.path.exists(filename):
+        Logger.info("Удаление файла" +filename)
+        os.remove(filename)
 Logger = create_logger("CSVHandler")
 
+parser = argparse.ArgumentParser()
+
+parser.add_argument(
+    "-r" "--remove",
+    type=str,
+    help="Удалить файл temp",
+    default="temp"
+)
+
+args = parser.parse_args()
+
+if args.remove == "temp":
+    remove_file("temp/temp.csv")
