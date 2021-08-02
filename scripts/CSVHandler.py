@@ -4,7 +4,7 @@ import traceback
 import os
 import csv
 import argparse
-from typing import Union, List, Dict, Any
+from typing import List, Dict, Any, Optional
 from Logger import create_logger
 
 
@@ -29,7 +29,7 @@ def write_to_csv(filename: str, data: Dict[str, str]) -> None:
     Logger.info("Запись в " + filename + " завершена")    
 
 #Чтение csv-файла
-def read_csv(filename: str) ->Union[List[Any], None]:
+def read_csv(filename: str) -> Optional[List[Any]]:
     try:
         Logger.info("Чтение файла " + filename)
         rows: List[str, float] = []
@@ -55,23 +55,4 @@ def get_currency_keys(dict: Dict[str, str]) -> List:
 def split_col_names_data(list: List[Any]):
     return list[0], list[1:] 
 
-#Удаление файла с именем filename   
-def remove_file(filename: str):
-    if os.path.exists(filename):
-        Logger.info("Удаление файла" +filename)
-        os.remove(filename)
 Logger = create_logger("CSVHandler")
-
-parser: argparse.ArgumentParser = argparse.ArgumentParser()
-
-parser.add_argument(
-    "-r", "--remove",
-    type=str,
-    help="Удалить файл temp",
-    default="temp"
-)
-
-args: argparse.Namespace = parser.parse_args()
-
-if args.remove == "temp":
-    remove_file("temp/temp.csv")

@@ -1,6 +1,6 @@
 #Набор функций для обращения к yaml файлу конфигурации и извлечения из него данных
 import traceback
-from typing import Dict, List, Union
+from typing import Dict, List, Optional
 import yaml
 from pathlib import Path
 from dataclasses import dataclass
@@ -22,9 +22,9 @@ class DB_config:
     password: str 
     host: str
     port: str
-    databases: str
+    databases: Dict[str,str]
 
-def read_config(section : str) -> Union[Dict[str, str], None]:
+def read_config(section : str) -> Optional[Dict[str, str]]:
     """
     Чтение конфигурационного файла. возвращает указанную секцию файла  
     """
@@ -40,12 +40,12 @@ def read_config(section : str) -> Union[Dict[str, str], None]:
         return None
 
 #Читает config.yaml и возвращает секцию API_CONNECTION 
-def load_API_config() -> Union[Dict[str, str], None]:
+def load_API_config() -> Optional[Dict[str, str]]:
     """
     Загрузка параметров подключения к API сайта (URL, token) 
     и списка валют 
     """
-    api_config: Union[Dict[str, str], None]= read_config("API_CONNECTION")
+    api_config: Optional[Dict[str, str]]= read_config("API_CONNECTION")
     if (api_config):
         return api_config
     else:
@@ -53,11 +53,11 @@ def load_API_config() -> Union[Dict[str, str], None]:
 
 
 #Парсит полученную секцию из load_API_config и возвращает параметры поэлементно
-def parse_API_config()-> Union[API_config, None]:
+def parse_API_config()-> Optional[API_config]:
     """
     Получить данные для подключения к API из конфигурационного файла
     """
-    config: Union[Dict[str, str], None] = load_API_config()
+    config: Optional[Dict[str, str]] = load_API_config()
     if config:
         API_params: API_config = API_config(config["URL"], config["Token"], config["Base"], ",".join(config["Currency"]))
         return API_params
@@ -65,22 +65,22 @@ def parse_API_config()-> Union[API_config, None]:
         Logger.error("Не удалось получить данные для подключения к API",  traceback.format_exc())
 
 #Получает данные для подключения к БД из config.yaml
-def load_database_config() -> Union[Dict[str, str], None]:
+def load_database_config() -> Optional[Dict[str, str]]:
     """
     Получить параметры подключения к БД из файла конфигурации
     """
-    database_config: Union[Dict[str, str], None] = read_config("DATABASE")
+    database_config: Optional[Dict[str, str]] = read_config("DATABASE")
     if database_config:
         return database_config
     else:
         return None
 
 #парсер конфигурации подключения к базе данных
-def parse_database_config() -> Union[DB_config, None]:
+def parse_database_config() -> Optional[DB_config]:
     """
     Извлечение данных о подключения к базе данных
     """
-    config: Union[Dict[str, str], None] = load_database_config()
+    config: Optional[Dict[str, str]] = load_database_config()
     if config:
         DB_params: DB_config = DB_config(config["Host"], config["UserName"], config["Password"],
                               config["Port"], config["Databases"])
