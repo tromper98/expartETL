@@ -4,7 +4,9 @@ import traceback
 import os
 import csv
 import argparse
+from dataclasses import dataclass
 from Logger import create_logger
+
 
 #Запись данных в csv-файл
 def write_to_csv(filename, data):

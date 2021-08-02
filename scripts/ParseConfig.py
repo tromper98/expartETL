@@ -1,9 +1,29 @@
 #Набор функций для обращения к yaml файлу конфигурации и извлечения из него данных
 import traceback
+from typing import List
 import yaml
 from pathlib import Path
+from dataclasses import dataclass
+
 
 from Logger import create_logger
+
+#DTO для хранения параметров подлючения к API веб-сервера с курсами валют
+@dataclass
+class API_config:
+    url: str
+    token: str
+    base: str
+    currency: List[str]
+
+#DTO для хранения параметров подключения к СУБД MySQL
+@dataclass
+class DB_config:
+    user: str
+    password: str 
+    host: str
+    port: str
+    databases: str
 
 def read_config(section):
     """
@@ -40,11 +60,8 @@ def parse_API_config():
     """
     config = load_API_config()
     if config:
-        url = config["URL"]
-        token = config["Token"]
-        currency = ",".join(config["Currency"])
-        base = config["Base"]
-        return url, token, base, currency
+        API_params = API_config(config["URL"], config["Token"], config["Base"], ",".join(config["Currency"]))
+        return API_params
     else:
         Logger.error("Не удалось получить данные для подключения к API",  traceback.format_exc())
 
@@ -66,14 +83,11 @@ def parse_database_config():
     """
     config = load_database_config()
     if config:
-        host = config["Host"]
-        user = config["UserName"]
-        password = config["Password"]
-        port = config["Port"]
-        databases = config["Databases"]
-        return  user, password, host, port, databases
+        DB_params = DB_config(config["Host"], config["UserName"], config["Password"],
+                              config["Port"], config["Databases"])
+        return  DB_params
     else:
         Logger.error("Не удалось получить данные о подключении к БД",  traceback.format_exc())
+        return None
 
 Logger = create_logger("ParseConfig")
-
