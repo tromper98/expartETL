@@ -52,7 +52,7 @@ def get_currency_keys(dict: Dict[str, str]) -> List:
     return nested_keys
 
 #разделить список на два: наименования столбцов и данные
-def split_col_names_data(list: List[Any]):
+def split_col_names_data(list: List[Any]) -> List[Any]:
     return list[0], list[1:] 
 
 Logger = create_logger("CSVHandler")

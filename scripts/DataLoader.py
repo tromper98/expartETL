@@ -5,7 +5,7 @@ import argparse
 import json
 import traceback
 from datetime import date, timedelta
-from typing import Dict, List, Any, Union, Optional
+from typing import Dict, Iterable, List, Any, Optional
 
 import requests 
 from requests.exceptions import RequestException
@@ -100,7 +100,7 @@ def load_timeseries_data(API_config: API_config, start_date: str, end_date: str)
         #отправка GET-запроса
         request_params: List[tuple] = [('access_key', API_config.token), ('base',  API_config.base), 
                                        ("start_date",  API_config.start_date), ("end_date", end_date),
-                                       ("symbols", currency)]
+                                       ("symbols", API_config.currency)]
         Logger.info("Отправка GET-запроса на URL:" +  API_config.url + "/timeseries")
         response: Response = send_GET( API_config.url, "timeseries", request_params)
         if response:
@@ -122,7 +122,7 @@ def load_example_data(API_config: API_config) -> Optional[Response]:
     Загрузка данных для начального наполнения БД 
     """
     #Итератор по датам.
-    def daterange(start_date: str, end_date: str)-> date:
+    def daterange(start_date: str, end_date: str)-> Iterable[date]:
         for n in range(int((end_date - start_date).days)):
             yield start_date + timedelta(n)
     start_date = date.today() - timedelta(180)

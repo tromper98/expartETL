@@ -21,7 +21,7 @@ class DB_config:
     user: str
     password: str 
     host: str
-    port: str
+    port: int
     databases: Dict[str,str]
 
 def read_config(section : str) -> Optional[Dict[str, str]]:
@@ -82,7 +82,7 @@ def parse_database_config() -> Optional[DB_config]:
     """
     config: Optional[Dict[str, str]] = load_database_config()
     if config:
-        DB_params: DB_config = DB_config(config["Host"], config["UserName"], config["Password"],
+        DB_params: DB_config = DB_config( config["UserName"], config["Password"], config["Host"],
                               config["Port"], config["Databases"])
         return  DB_params
     else:
