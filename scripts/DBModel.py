@@ -1,6 +1,7 @@
 #Функции взаимодействия с БД MySql
 #выполняют подключение и загрузку данных в БД
 import argparse
+import os
 from datetime import  datetime
 import traceback
 from typing import Optional, List, Any
@@ -114,12 +115,12 @@ args: argparse.Namespace = parser.parse_args()
 
 if args.insert == "rate":
     if connection:
-        _, data = split_col_names_data(read_csv("temp/temp.csv"))
+        _, data = split_col_names_data(read_csv(os.path.join("/", "tmp", "expart.csv")))
         with connection:
             insert_rates(connection, data)
     else:
         print("Отсутствует соединение с БД")
-        #Logger.error("Отсутствует соединение с БД",  traceback.format_exc())
+        Logger.error("Отсутствует соединение с БД",  traceback.format_exc())
 
 #Начальное заполнение таблицы. Применять к пустой БД
 if args.insert == "example":
@@ -133,4 +134,4 @@ if args.insert == "example":
             connection.cursor().execute("SET FOREIGN_KEY_CHECKS=1")
     else:
         print("Отсутствует соединение с БД")
-        #Logger.error("Отсутствует соединение с БД",  traceback.format_exc())
+        Logger.error("Отсутствует соединение с БД",  traceback.format_exc())

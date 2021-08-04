@@ -55,4 +55,24 @@ def get_currency_keys(dict: Dict[str, str]) -> List:
 def split_col_names_data(list: List[Any]) -> List[Any]:
     return list[0], list[1:] 
 
+#Удалить временный csv файл 
+def remove_file(filename):
+    if os.path.exists(filename):
+        Logger.info("Удаление файла" +filename)
+        os.remove(filename)
+
 Logger = create_logger("CSVHandler")
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument(
+    "-r" "--remove",
+    type=str,
+    help="Удалить файл temp",
+    default="temp"
+)
+
+args = parser.parse_args()
+
+if args.remove == "temp":
+    remove_file(os.path.join("/", "tmp", "expart.csv"))

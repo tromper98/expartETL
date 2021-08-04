@@ -4,6 +4,7 @@ import time
 import argparse
 import json
 import traceback
+import os
 from datetime import date, timedelta
 from typing import Dict, Iterable, List, Any, Optional
 
@@ -133,7 +134,7 @@ def load_example_data(API_config: API_config) -> Optional[Response]:
         if json:
             data: Dict[str, Dict] = convert_JSON(json)
             write_to_csv("temp/example.csv", data)
-        
+
 Logger: Logger = create_logger("DataLoader")
 convert_JSON: Dict[str, Dict] = lambda json: {json["date"] : json["rates"]} #Конвертировать JSON в формат: {date :{"cur_name1" : num1, "cur_name2" : num2 ...}} 
 #Добавление аргументов командной строки
@@ -177,4 +178,4 @@ if args.option == "example":
 
 #Если данные были получены, то сохраняем в csv-файл
 if args.option != "example" and check_response(data):
-    write_to_csv("temp/temp.csv", data)
+    write_to_csv(os.path("/", "tmp", "expart.csv"), data)
