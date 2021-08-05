@@ -1,4 +1,5 @@
 import logging
+import os
 from pathlib import Path
  
 def create_logger(logger_name: str) -> logging.Logger:
@@ -10,6 +11,7 @@ def create_logger(logger_name: str) -> logging.Logger:
     myself: Path = Path(__file__).resolve()
     filePath: str = myself.parents[1] / "app.log"
     fh: logging.FileHandler = logging.FileHandler(filePath)
+    os.chmod(filePath, 0o777)
     # Формат записи логов    
     formatter: logging.Formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     fh.setFormatter(formatter)

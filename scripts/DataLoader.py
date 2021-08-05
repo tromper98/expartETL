@@ -178,4 +178,4 @@ if args.option == "example":
 
 #Если данные были получены, то сохраняем в csv-файл
 if args.option != "example" and check_response(data):
-    write_to_csv(os.path("/", "tmp", "expart.csv"), data)
+    write_to_csv(os.path("/", 'usr', 'local',"tmp", "expart.csv"), data)

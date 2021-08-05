@@ -1,5 +1,4 @@
 requests==2.25.1
 numpy==1.19.2
 mysql_connector_repackaged==0.3.1
-python_crontab==2.5.1
 PyYAML==5.4.1

@@ -75,4 +75,4 @@ parser.add_argument(
 args = parser.parse_args()
 
 if args.remove == "temp":
-    remove_file(os.path.join("/", "tmp", "expart.csv"))
+    remove_file(os.path.join("/", 'usr', 'local',"tmp", "expart.csv"))

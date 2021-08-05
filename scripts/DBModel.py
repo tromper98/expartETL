@@ -115,7 +115,7 @@ args: argparse.Namespace = parser.parse_args()
 
 if args.insert == "rate":
     if connection:
-        _, data = split_col_names_data(read_csv(os.path.join("/", "tmp", "expart.csv")))
+        _, data = split_col_names_data(read_csv(os.path.join("/", 'usr', 'local',"tmp", "expart.csv")))
         with connection:
             insert_rates(connection, data)
     else:
@@ -125,7 +125,7 @@ if args.insert == "rate":
 #Начальное заполнение таблицы. Применять к пустой БД
 if args.insert == "example":
     if connection:
-        column_names, data = split_col_names_data(read_csv("temp/example.csv"))
+        column_names, data = split_col_names_data(os.path.join("/", 'usr', 'local',"tmp", "expart.csv"))
         with connection:
             connection.cursor().execute("SET FOREIGN_KEY_CHECKS=0")
             insert_rates(connection, data)
