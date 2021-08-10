@@ -1,0 +1,20 @@
+
+version: "3"
+
+services:
+  db:
+    image: tromper/expartdb
+    container_name: expartDataBase
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: secret_root_password
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: test12345
+    ports: 
+      - "6033:3306"
+  etl:
+    image: tromper/expartetl
+    container_name: expartetl
+    restart: always
+    ports:
+      - "8080:8080"
